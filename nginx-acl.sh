@@ -14,7 +14,9 @@ if [ -z "$rule" ] || [ -z "$asn" ]; then
     exit 1
 fi
 
-echo "#AS${asn}"
+curl -sS --fail https://stat.ripe.net/data/as-overview/data.json\?resource\=AS{$asn}\&sourceapp\=nginx-acl \
+    | jq -r '"# AS" + .data.resource + ", " + .data.holder + ", " + .time' 
+
 curl -sS --fail https://stat.ripe.net/data/announced-prefixes/data.json\?resource\=AS${asn}\&sourceapp\=nginx-acl \
     | jq -r '.data.prefixes | map(.prefix) | .[]' \
     | xargs -I% echo "${rule} %;"
