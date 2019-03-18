@@ -5,7 +5,7 @@ set -o nounset # Treat unset variables as an error
 rule=${1:-}
 asn=${2:-}
 
-if [ -z "$rule" ] || [ -z "$asn" ]; then
+if [[ -z "$rule" ]] || [[ -z "$asn" ]]; then
     echo "error: invalid arguments"
     echo "usage:"
     echo -e "\tnginx-acl.sh <rule> <asn>"
@@ -14,9 +14,9 @@ if [ -z "$rule" ] || [ -z "$asn" ]; then
     exit 1
 fi
 
-curl -sS --fail https://stat.ripe.net/data/as-overview/data.json\?resource\=AS{$asn}\&sourceapp\=nginx-acl \
+curl -sS --fail "https://stat.ripe.net/data/as-overview/data.json?resource=AS{$asn}&sourceapp=nginx-acl" \
     | jq -r '"# AS" + .data.resource + ", " + .data.holder + ", " + .time' 
 
-curl -sS --fail https://stat.ripe.net/data/announced-prefixes/data.json\?resource\=AS${asn}\&sourceapp\=nginx-acl \
+curl -sS --fail "https://stat.ripe.net/data/announced-prefixes/data.json?resource=AS${asn}&sourceapp=nginx-acl" \
     | jq -r '.data.prefixes | map(.prefix) | .[]' \
     | xargs -I% echo "${rule} %;"
